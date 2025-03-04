@@ -400,3 +400,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 benchmark.db
+/benchmark.db-shm
+/benchmark.db-wal
