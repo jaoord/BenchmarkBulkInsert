@@ -7,6 +7,8 @@ namespace BenchmarkBulkInsert.Db
         public DbSet<Metar> Metars { get; set; }
         public DbSet<MetarWithUniqueConstraint> MetarsWithUniqueConstraint { get; set; }
 
+        public DbSet<TmpMetar> TmpMetars { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=benchmark.db");

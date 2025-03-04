@@ -18,7 +18,7 @@ namespace BenchmarkBulkInsert
                 context.Database.ExecuteSqlRaw("DELETE FROM MetarsWithUniqueConstraint");
 
                 // Add test data to the database
-                context.Metars.AddRange(DataProvider.GetTestData().Take(1000));
+                context.Metars.AddRange(DataProvider.GetTestMetar().Take(1000));
                 context.MetarsWithUniqueConstraint.AddRange(DataProvider.GetTestMetarWithUniqueConstraint().Take(1000));
                 context.SaveChanges();
             }
@@ -36,9 +36,11 @@ namespace BenchmarkBulkInsert
             Console.WriteLine("2. Insert and ignore duplicates for unique constraint using try/catch");
             Console.WriteLine("3. INSERT ... WHERE NOT EXISTS");
             Console.WriteLine("4. INSERT IGNORE (for unique constraint) using raw sql");
+            Console.WriteLine("5. Using temporary table");
+
             Console.Write("Enter the number of your choice: ");
 
-            if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= 4)
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= 5)
             {
                 return choice;
             }
@@ -71,7 +73,7 @@ namespace BenchmarkBulkInsert
             var stopwatch = Stopwatch.StartNew();
             for (int i = 0; i < numberOfRuns; i++)
             {
-                Console.WriteLine($"Running benchmark {benchmarkType} ({i + 1}/{numberOfRuns})");
+                var sw1 = Stopwatch.StartNew();
                 switch (benchmarkType)
                 {
                     case 1:
@@ -86,10 +88,15 @@ namespace BenchmarkBulkInsert
                     case 4:
                         new InsertOrIgnoreBenchmark().RunBenchmark();
                         break;
+                    case 5:
+                        new TemporaryTableBenchmark().RunBenchmark();
+                        break;
                     default:
                         Console.WriteLine($"Unknown benchmark type: {benchmarkType}");
                         return;
                 }
+                sw1.Stop();
+                Console.WriteLine($"Benchmark {benchmarkType} ({i + 1}/{numberOfRuns}) completed in {sw1.ElapsedMilliseconds} ms");
             }
             // stop timer and calculate elapsed time
             stopwatch.Stop();
@@ -108,9 +115,9 @@ namespace BenchmarkBulkInsert
         {
             using (var context = new BenchmarkDbContext())
             {
-                if (benchmarkType == 1 || benchmarkType == 3)
+                if (benchmarkType == 1 || benchmarkType == 3 || benchmarkType == 5)
                 {
-                    var testDataCount = DataProvider.GetTestData().Count();
+                    var testDataCount = DataProvider.GetTestMetar().Count();
                     var metarCount = context.Metars.Count();
                     if (metarCount != testDataCount)
                     {

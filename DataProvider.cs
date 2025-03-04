@@ -7,10 +7,15 @@ namespace BenchmarkBulkInsert
 
         public static IEnumerable<MetarWithUniqueConstraint> GetTestMetarWithUniqueConstraint()
         {
-            return GetTestData().Select(x => new MetarWithUniqueConstraint(x));
+            return GetTestMetar().Select(x => new MetarWithUniqueConstraint(x));
         }
 
-        public static List<Metar> GetTestData()
+        public static IEnumerable<TmpMetar> GetTestTmpMetar()
+        {
+            return GetTestMetar().Select(x => new TmpMetar(x));
+        }
+
+        public static List<Metar> GetTestMetar()
         {
             return new()
             {

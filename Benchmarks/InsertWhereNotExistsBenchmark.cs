@@ -10,7 +10,7 @@ namespace BenchmarkBulkInsert.Benchmarks
         {
             using (var db = new BenchmarkDbContext())
             {
-                foreach (var metar in DataProvider.GetTestData())
+                foreach (var metar in DataProvider.GetTestMetar())
                 {
                     var sql = @"
                         INSERT INTO Metars (Station, RawData, LastChange)

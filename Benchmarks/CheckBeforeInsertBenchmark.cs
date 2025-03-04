@@ -9,7 +9,7 @@ namespace BenchmarkBulkInsert.Benchmarks
         {
             using (var db = new BenchmarkDbContext())
             {
-                foreach (var metar in DataProvider.GetTestData())
+                foreach (var metar in DataProvider.GetTestMetar())
                 {
                     if (db.Metars.Any(m => m.Station == metar.Station && m.LastChange == metar.LastChange))
                     {
