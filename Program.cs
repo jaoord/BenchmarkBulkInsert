@@ -33,11 +33,12 @@ namespace BenchmarkBulkInsert
         {
             Console.WriteLine("Select a benchmark:");
             Console.WriteLine("1. Check before insert");
-            Console.WriteLine("2. Insert and ignore duplicates");
+            Console.WriteLine("2. Insert and ignore duplicates for unique constraint using try/catch");
             Console.WriteLine("3. INSERT ... WHERE NOT EXISTS");
+            Console.WriteLine("4. INSERT IGNORE (for unique constraint) using raw sql");
             Console.Write("Enter the number of your choice: ");
 
-            if (int.TryParse(Console.ReadLine(), out int choice) && (choice >= 1 || choice <= 2))
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= 4)
             {
                 return choice;
             }
@@ -82,6 +83,9 @@ namespace BenchmarkBulkInsert
                     case 3:
                         new InsertWhereNotExistsBenchmark().RunBenchmark();
                         break;
+                    case 4:
+                        new InsertOrIgnoreBenchmark().RunBenchmark();
+                        break;
                     default:
                         Console.WriteLine($"Unknown benchmark type: {benchmarkType}");
                         return;
@@ -118,7 +122,7 @@ namespace BenchmarkBulkInsert
                     }
                 }
 
-                if (benchmarkType == 2)
+                if (benchmarkType == 2 || benchmarkType == 4)
                 {
                     var testDataWithUniqueConstraintCount = DataProvider.GetTestMetarWithUniqueConstraint().Count();
                     var metarWithUniqueConstraintCount = context.MetarsWithUniqueConstraint.Count();
