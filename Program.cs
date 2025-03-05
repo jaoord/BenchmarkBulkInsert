@@ -33,14 +33,16 @@ namespace BenchmarkBulkInsert
         {
             Console.WriteLine("Select a benchmark:");
             Console.WriteLine("1. Check before insert");
-            Console.WriteLine("2. Insert and ignore duplicates for unique constraint using try/catch");
-            Console.WriteLine("3. INSERT ... WHERE NOT EXISTS");
-            Console.WriteLine("4. INSERT IGNORE (for unique constraint) using raw sql");
-            Console.WriteLine("5. Using temporary table");
+            Console.WriteLine("2. Check before insert no tracking");
+            Console.WriteLine("3. Insert and ignore duplicates for unique constraint using try/catch");
+            Console.WriteLine("4. INSERT ... WHERE NOT EXISTS");
+            Console.WriteLine("5. INSERT IGNORE (for unique constraint) using raw sql");
+            Console.WriteLine("6. Using temporary table");
+            Console.WriteLine("7. Check in memory for existing records and batch save every 1000 rows");
 
             Console.Write("Enter the number of your choice: ");
 
-            if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= 5)
+            if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= 7)
             {
                 return choice;
             }
@@ -80,16 +82,22 @@ namespace BenchmarkBulkInsert
                         new CheckBeforeInsertBenchmark().RunBenchmark();
                         break;
                     case 2:
-                        new IgnoreUniqueConstraintBenchmark().RunBenchmark();
+                        new CheckBeforeInsertBenchmarkNoTracking().RunBenchmark();
                         break;
                     case 3:
-                        new InsertWhereNotExistsBenchmark().RunBenchmark();
+                        new IgnoreUniqueConstraintBenchmark().RunBenchmark();
                         break;
                     case 4:
-                        new InsertOrIgnoreBenchmark().RunBenchmark();
+                        new InsertWhereNotExistsBenchmark().RunBenchmark();
                         break;
                     case 5:
+                        new InsertOrIgnoreBenchmark().RunBenchmark();
+                        break;
+                    case 6:
                         new TemporaryTableBenchmark().RunBenchmark();
+                        break;
+                    case 7:
+                        new MemoryCheckBeforeInsertBenchmark().RunBenchmark();
                         break;
                     default:
                         Console.WriteLine($"Unknown benchmark type: {benchmarkType}");
@@ -115,7 +123,7 @@ namespace BenchmarkBulkInsert
         {
             using (var context = new BenchmarkDbContext())
             {
-                if (benchmarkType == 1 || benchmarkType == 3 || benchmarkType == 5)
+                if (benchmarkType is 1 or 2 or 4 or 6 or 7)
                 {
                     var testDataCount = DataProvider.GetTestMetar().Count();
                     var metarCount = context.Metars.Count();
@@ -129,7 +137,7 @@ namespace BenchmarkBulkInsert
                     }
                 }
 
-                if (benchmarkType == 2 || benchmarkType == 4)
+                if (benchmarkType is 3 or 5)
                 {
                     var testDataWithUniqueConstraintCount = DataProvider.GetTestMetarWithUniqueConstraint().Count();
                     var metarWithUniqueConstraintCount = context.MetarsWithUniqueConstraint.Count();

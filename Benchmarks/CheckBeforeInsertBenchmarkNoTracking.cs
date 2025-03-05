@@ -1,8 +1,9 @@
 ﻿using BenchmarkBulkInsert.Db;
+using Microsoft.EntityFrameworkCore;
 
 namespace BenchmarkBulkInsert.Benchmarks
 {
-    class CheckBeforeInsertBenchmark
+    class CheckBeforeInsertBenchmarkNoTracking
     {
         public void RunBenchmark()
         {
@@ -14,7 +15,8 @@ namespace BenchmarkBulkInsert.Benchmarks
                     {
                         continue;
                     }
-                    db.Metars.Add(metar);
+                    db.Entry(metar).State = EntityState.Detached;
+                    db.Metars.Attach(metar);
                 }
                 db.SaveChanges();
             }
